@@ -42,6 +42,7 @@ class MainWindows(QtGui.QMainWindow):
 		self.cordy2=0
 		self.const = 0
 		self.handled = True
+		self.check = False
 
 		self.outfilename = ""
 
@@ -271,17 +272,22 @@ class MainWindows(QtGui.QMainWindow):
 		<p>F1 - справка</p>")
 	
 	def Save(self):
-		outfilename = QtGui.QFileDialog.getSaveFileName(self.label, u"Сохранение файла", self.fileName[:-4]+"_changed" + ".JPG")
-		self.image.save(outfilename)
+		file_types = "PNG (*.png);; JPG (*.jpg);; BMP (*.bmp)"
+		outfilename, typefilter = QtGui.QFileDialog.getSaveFileNameAndFilter(self.label, u"Сохранение файла", self.fileName[:-4]+"_changed", file_types)
+		typefilter = typefilter[7:-1]
+		print typefilter
+		self.image.save(outfilename+typefilter)
 
 	def closeEvent(self, event):
 		if self.outfilename != "":
-			os.remove(self.outfilename)
+			if self.check == False:
+				os.remove(self.outfilename)
 
 	def Main(self):
 		self.handled = False
 		name = str(self.fileName2)
 		self.outfilename = name.decode("UTF-8")[:-4] + "_cache.png"
+		self.outfilenameRemove = name[:-4] +"_cache.png"
 		image = Image.open(name.decode("utf-8"))
 
 		x1 = min(self.cordx1,self.cordx2)
@@ -333,6 +339,7 @@ class MainWindows(QtGui.QMainWindow):
 		self.image = QtGui.QImage(self.outfilename)
 		self.label.setPixmap(QtGui.QPixmap.fromImage(self.image))
 		self.label.adjustSize()
+		self.check = True
 		os.remove(self.outfilename)
 
 
